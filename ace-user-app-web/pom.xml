@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ace-user-app-projects</artifactId>
+        <groupId>org.ace</groupId>
+        <version>1.0.0.0-SNAPSHOT</version>
+    </parent>
+    <description>
+        用户账号微服务逻辑层
+        登录、注册等功能
+    </description>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ace-user-app-web</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-user-app-logic-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-user-app-logic-define</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-user-app-logic-api-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-fw-ms-application-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-fw-ms-discovery-client-autoconfigure</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>ace-account-logic-api-web</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.2.4.RELEASE</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 复制生成的jar包到其他位置,方便使用jib插件制作docker image -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-lib-src-webapps</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <tasks>
+                                <!-- 你将要拷贝的位置 -->
+                                <copy todir="target/jib/">
+                                    <!-- 从哪里拷贝 -->
+                                    <fileset dir="${project.build.directory}">
+                                        <!-- 拷贝内容 -->
+                                        <include name="*.jar"/>
+                                    </fileset>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--使用jib插件-->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>2.1.0</version>
+                <configuration>
+                    <!--from节点用来设置镜像的基础镜像，相当于Docerkfile中的FROM关键字-->
+                    <from>
+                        <!--使用openjdk官方镜像，tag是 -->
+                        <image>openjdk:11.0.6-jre-buster</image>
+                    </from>
+                    <to>
+                        <!--镜像名称和tag，使用了mvn内置变量${project.version}，表示当前工程的version-->
+                        <image>${project.name}:latest</image>
+                    </to>
+                    <!--容器相关的属性-->
+                    <container>
+                        <entrypoint>
+                            <arg>/bin/sh</arg>
+                            <arg>-c</arg>
+                            <arg>java -Xms128M -Xmx256M -jar
+                                /ace/ace-account-logic-api-web/ace-account-logic-api-web.jar
+                            </arg>
+                        </entrypoint>
+                    </container>
+                    <extraDirectories>
+                        <paths>
+                            <path>src/main/jib</path>
+                            <path>target/jib</path>
+                        </paths>
+                    </extraDirectories>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
