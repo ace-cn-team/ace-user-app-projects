@@ -5,9 +5,8 @@ import ace.account.base.define.dao.enums.account.AccountBizTypeEnum;
 import ace.account.base.define.dao.model.entity.Account;
 import ace.account.base.define.enums.LoginTypeEnum;
 import ace.account.base.define.model.request.FindByAppIdAndUserNameRequest;
-import ace.cas.base.define.model.bo.OAuth2Token;
-import ace.user.app.logic.define.module.identity.login.request.LoginByUserNameRequest;
-import ace.user.app.logic.define.module.identity.login.response.LoginByUserNameResponse;
+import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
+import ace.user.app.logic.define.model.response.identity.login.LoginByUserNameResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Component;
  * @author Caspar
  * @contract 279397942@qq.com
  * @create 2020/2/25 14:51
- * @description
+ * @description 用户名登录核心逻辑
  */
 @Component
 @Slf4j

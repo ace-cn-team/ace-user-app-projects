@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.ace</groupId>
         <artifactId>ace-projects</artifactId>
-        <version>1.0.0.4</version>
+        <version>1.0.0.10</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,21 +25,37 @@
     <modules>
         <module>ace-user-app-logic-api</module>
         <module>ace-user-app-logic-define</module>
-        <module>ace-user-app-web</module>
         <module>ace-user-app-logic-api-core</module>
         <module>ace-user-app-logic-api-autoconfigure</module>
+        <module>ace-user-app-logic-api-core-junit</module>
+        <module>ace-user-app-web</module>
     </modules>
     <properties>
-        <ace.fw.version>1.0.0.6</ace.fw.version>
-        <ace.account.base.version>1.0.0.10</ace.account.base.version>
-        <ace.cas.base.version>1.0.0.5</ace.cas.base.version>
-        <ace.sms.base.version>1.0.0.9</ace.sms.base.version>
+        <ace.fw.version>1.0.0.21</ace.fw.version>
+        <ace.dependency.management.version>1.0.0.11</ace.dependency.management.version>
+        <ace.account.base.version>1.0.0.13</ace.account.base.version>
+        <ace.cas.base.version>1.0.0.9</ace.cas.base.version>
+        <ace.sms.base.version>1.0.0.12</ace.sms.base.version>
         <ace.captcha.base.version>1.0.0.4</ace.captcha.base.version>
-        <ace.user.base.version>1.0.0.1</ace.user.base.version>
-        <ace.common.base.version>1.0.0.6</ace.common.base.version>
+        <ace.user.base.version>1.0.0.5</ace.user.base.version>
+        <ace.common.base.version>1.0.0.11</ace.common.base.version>
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.ace</groupId>
+                <artifactId>ace-dependency-management</artifactId>
+                <version>${ace.dependency.management.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.ace</groupId>
+                <artifactId>ace-framework-projects</artifactId>
+                <version>${ace.fw.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
             <dependency>
                 <groupId>org.ace</groupId>
                 <artifactId>ace-user-base-api</artifactId>
@@ -48,6 +64,11 @@
             <dependency>
                 <groupId>org.ace</groupId>
                 <artifactId>ace-user-base-define</artifactId>
+                <version>${ace.user.base.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ace</groupId>
+                <artifactId>ace-user-base-api-client-autoconfigure</artifactId>
                 <version>${ace.user.base.version}</version>
             </dependency>
             <dependency>
@@ -151,11 +172,6 @@
 
             <dependency>
                 <groupId>org.ace</groupId>
-                <artifactId>ace-fw-utils</artifactId>
-                <version>${ace.fw.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ace</groupId>
                 <artifactId>ace-fw-log4j2-autoconfigure</artifactId>
                 <version>${ace.fw.version}</version>
             </dependency>
@@ -171,5 +187,33 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
+    <build>
+        <plugins>
+            <!-- 统一更改版本  说明：http://www.lavecoral.me/archives/213.html -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
+            <!-- 要将源码放上去，需要加入这个插件 -->
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

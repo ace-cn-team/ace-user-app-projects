@@ -2,14 +2,17 @@ package ace.user.app.logic.api.service;
 
 
 import ace.fw.model.response.GenericResponseExt;
-import ace.user.app.logic.define.module.identity.login.request.LoginByUserNameRequest;
-import ace.user.app.logic.define.module.identity.login.request.LoginByMobileRequest;
-import ace.user.app.logic.define.module.identity.register.request.RegisterByUserNameRequest;
-import ace.user.app.logic.define.module.identity.register.request.RegisterByMobileRequest;
-import ace.user.app.logic.define.module.identity.login.response.LoginByUserNameResponse;
-import ace.user.app.logic.define.module.identity.login.response.LoginByMobileResponse;
-import ace.user.app.logic.define.module.identity.register.response.RegisterByUserNameResponse;
-import ace.user.app.logic.define.module.identity.register.response.RegisterByMobileResponse;
+import ace.user.app.logic.define.model.request.identity.LogoutRequest;
+import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
+import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
+import ace.user.app.logic.define.model.request.identity.register.RegisterByUserNameRequest;
+import ace.user.app.logic.define.model.request.identity.register.RegisterByMobileRequest;
+import ace.user.app.logic.define.model.request.identity.GetCurrentUserRequest;
+import ace.user.app.logic.define.model.response.identity.login.LoginByUserNameResponse;
+import ace.user.app.logic.define.model.response.identity.login.LoginByMobileResponse;
+import ace.user.app.logic.define.model.response.identity.register.RegisterByUserNameResponse;
+import ace.user.app.logic.define.model.response.identity.register.RegisterByMobileResponse;
+import ace.user.app.logic.define.model.response.identity.GetCurrentUserResponse;
 
 import javax.validation.Valid;
 
@@ -34,7 +37,7 @@ public interface IdentityLogicService {
      * @param request
      * @return
      */
-    GenericResponseExt<RegisterByUserNameResponse> registerByAccount(@Valid RegisterByUserNameRequest request);
+    GenericResponseExt<RegisterByUserNameResponse> registerByUserName(@Valid RegisterByUserNameRequest request);
 
     /**
      * 根据手机账号登陆
@@ -50,7 +53,20 @@ public interface IdentityLogicService {
      * @param request
      * @return
      */
-    GenericResponseExt<LoginByUserNameResponse> loginByAccount(@Valid LoginByUserNameRequest request);
+    GenericResponseExt<LoginByUserNameResponse> loginByUserName(@Valid LoginByUserNameRequest request);
 
+    /**
+     * 获取当前账号个人信息
+     *
+     * @param request
+     * @return
+     */
+    GenericResponseExt<GetCurrentUserResponse> getCurrentUser(@Valid GetCurrentUserRequest request);
 
+    /**
+     * 登出
+     *
+     * @param request
+     */
+    GenericResponseExt<Boolean> logout(@Valid LogoutRequest request);
 }

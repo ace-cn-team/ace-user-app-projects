@@ -1,6 +1,7 @@
 package ace.user.app.logic.api.core.converter;
 
-import ace.user.app.logic.define.module.model.dto.OAuth2TokenDto;
+import ace.cas.base.define.model.bo.OAuth2Token;
+import ace.user.app.logic.define.model.vo.OAuth2TokenVo;
 import org.mapstruct.Mapper;
 
 /**
@@ -11,5 +12,5 @@ import org.mapstruct.Mapper;
  */
 @Mapper(componentModel = "spring")
 public interface OAuthTokenConverter {
-    OAuth2TokenDto toUserToken(ace.cas.base.define.model.bo.OAuth2Token oAuth2Token);
+    OAuth2TokenVo toUserToken(OAuth2Token oAuth2Token);
 }

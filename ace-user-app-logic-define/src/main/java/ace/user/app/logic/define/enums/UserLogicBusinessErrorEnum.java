@@ -10,8 +10,8 @@ import lombok.Getter;
  * @description Integer[] USER = new Integer[]{130000, 139999};
  */
 public enum UserLogicBusinessErrorEnum implements BaseEnum<String> {
-    IMAGE_VERIFY_CODE_INCORRECT("130010", "请输入正确的验证码"),
-    ;
+    DATA_EXPIRE("130001", "数据已过期,请重试"),
+    IMAGE_VERIFY_CODE_INCORRECT("130010", "请输入正确的验证码");
     @Getter
     private String code;
     @Getter

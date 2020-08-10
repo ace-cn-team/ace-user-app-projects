@@ -8,11 +8,11 @@ package ace.user.app.logic.define.constants;
  */
 public class PatternConstants {
     /**
-     * 密码格式,只能输入由数字和26个英文字母或者下划线组成的字符串：
+     * 密码格式
      */
-    public static final String PASSWORD = "^/w{6,32}$";
+    public static final String PASSWORD = "^(?![A-Za-z0-9]+$)(?![a-z0-9\\W]+$)(?![A-Za-z\\W]+$)(?![A-Z0-9\\W]+$)[a-zA-Z0-9\\W]{6,32}$";
     /**
-     * 账号格式
+     * 账号格式,只能输入由数字和26个英文字母或者下划线组成的字符串：
      */
     public static final String USER_NAME = "^[0-9a-zA-Z_@\\.]{6,32}$";
     /**

@@ -49,11 +49,6 @@
             <groupId>org.ace</groupId>
             <artifactId>ace-common-base-define</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.ace</groupId>
-            <artifactId>ace-fw-utils</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.ace</groupId>
             <artifactId>ace-fw-utils-web</artifactId>
@@ -74,6 +69,10 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-fw-logic-common</artifactId>
         </dependency>
     </dependencies>
 </project>

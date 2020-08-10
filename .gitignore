@@ -1,0 +1,13 @@
+/ace-user-app-logic-api/target/classes/ace/user/app/logic/api/service/
+/ace-user-app-logic-api/ace-user-app-logic-api.iml
+/ace-user-app-logic-api-autoconfigure/target/classes/
+/ace-user-app-logic-api-autoconfigure/ace-user-app-logic-api-autoconfigure.iml
+/ace-user-app-logic-api-core/target/
+/ace-user-app-logic-api-core/ace-user-app-logic-api-core.iml
+/ace-user-app-logic-api-core-junit/ace-user-app-logic-api-core-junit.iml
+/ace-user-app-logic-define/target/classes/ace/user/app/logic/define/
+/ace-user-app-logic-define/ace-user-app-logic-define.iml
+/.idea/
+/ace-user-app-projects.iml
+/ace-user-app-web/target/
+/ace-user-app-web/ace-user-app-web.iml

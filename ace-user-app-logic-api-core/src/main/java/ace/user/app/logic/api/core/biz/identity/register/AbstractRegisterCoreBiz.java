@@ -12,16 +12,17 @@ import ace.account.base.define.enums.AccountBusinessErrorEnum;
 import ace.account.base.define.model.request.RegisterRequest;
 import ace.account.base.define.model.vo.RegisterSuccessEventLogParams;
 import ace.cas.base.api.facade.OAuth2BaseApiFacade;
-import ace.fw.utils.web.WebUtils;
-import ace.user.app.logic.define.module.identity.register.request.IRegisterRequest;
-import ace.user.app.logic.define.module.identity.register.response.IRegisterResponse;
-import ace.user.app.logic.define.module.model.dto.OAuth2TokenDto;
-import ace.cas.base.define.model.request.facade.OAuth2GetTokenFacadeRequest;
 import ace.fw.json.JsonUtils;
+import ace.fw.logic.common.util.AceUUIDUtils;
 import ace.fw.util.AceLocalDateTimeUtils;
 import ace.fw.util.BusinessErrorUtils;
+import ace.fw.utils.web.WebUtils;
 import ace.user.app.logic.api.core.converter.OAuthTokenConverter;
+import ace.user.app.logic.api.core.provider.OAuth2Provider;
 import ace.user.app.logic.api.core.util.PasswordUtils;
+import ace.user.app.logic.define.model.request.identity.register.IRegisterRequest;
+import ace.user.app.logic.define.model.response.identity.register.IRegisterResponse;
+import ace.user.app.logic.define.model.vo.OAuth2TokenVo;
 import ace.user.base.api.UserBaseApi;
 import ace.user.base.define.dao.entity.User;
 import ace.user.base.define.dao.enums.user.UserSexEnum;
@@ -53,6 +54,8 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
     private OAuthTokenConverter oAuthTokenConverter;
     @Autowired
     private AccountEventBaseApi accountEventBaseApi;
+    @Autowired
+    private OAuth2Provider oAuth2Provider;
 
     public Response register(Request request) {
         // 账号是否已存在
@@ -61,14 +64,14 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
         this.check(request);
         // 保存注册账号与注册账号事件
         Account savedAccount = this.saveAccountAndRegisterEvent(request);
-        // 保存用户信息
-        User savedUser = this.saveUser(request, savedAccount);
+        // 保存用户信息,所有异常屏蔽
+        this.saveUser(request, savedAccount);
         // 生成登录信息
-        OAuth2TokenDto oauth2TokenDto = this.getOAuth2TokenBo(savedAccount);
+        OAuth2TokenVo oauth2TokenVo = this.getOAuth2Token(savedAccount);
         // 创建返回结果
         Response response = this.newResponse();
         // 配置返回结果
-        this.configResponse(response, request, savedAccount, savedUser, oauth2TokenDto);
+        this.configResponse(response, request, savedAccount, oauth2TokenVo);
         // 生成返回结果
         return response;
     }
@@ -79,11 +82,10 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
      * @param response
      * @param request
      * @param savedAccount
-     * @param savedUser
-     * @param oauth2TokenDto
+     * @param oauth2TokenVo
      */
-    protected void configResponse(Response response, Request request, Account savedAccount, User savedUser, OAuth2TokenDto oauth2TokenDto) {
-        response.setToken(oauth2TokenDto);
+    protected void configResponse(Response response, Request request, Account savedAccount, OAuth2TokenVo oauth2TokenVo) {
+        response.setToken(oauth2TokenVo);
     }
 
 
@@ -91,7 +93,7 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
         String nickName = this.resolveNickName(request);
         User user = User
                 .builder()
-                .id(Generators.timeBasedGenerator().generate().toString())
+                .id(savedAccount.getId())
                 .updateTime(LocalDateTime.now())
                 .signature("")
                 .sex(UserSexEnum.UNKNOWN.getCode())
@@ -101,26 +103,21 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
                 .birthday(AceLocalDateTimeUtils.MIN_MYSQL)
                 .avatarUrl("")
                 .appId(savedAccount.getAppId())
-                .accountId(savedAccount.getId())
                 .build();
 
         user = this.saveUserBefore(request, savedAccount, user);
 
-        this.userBaseApi.save(user).check();
+        try {
+            this.userBaseApi.save(user).check();
+        } catch (Throwable ex) {
+            log.error("保存用户失败", ex);
+        }
 
         return user;
     }
 
-    protected OAuth2TokenDto getOAuth2TokenBo(Account savedAccount) {
-
-        ace.cas.base.define.model.bo.OAuth2Token oAuth2Token = oAuth2BaseApiFacade.getOAuth2Token(
-                OAuth2GetTokenFacadeRequest
-                        .builder()
-                        .build()
-                        .setAccountId(savedAccount.getId())
-        ).check();
-
-        return oAuthTokenConverter.toUserToken(oAuth2Token);
+    protected OAuth2TokenVo getOAuth2Token(Account savedAccount) {
+        return oAuth2Provider.getOAuth2Token(savedAccount);
     }
 
     private Account saveAccountAndRegisterEvent(Request request) {
@@ -140,7 +137,7 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
                 .userName(null)
                 .bizType(AccountBizTypeEnum.USER.getCode())
                 .createTime(LocalDateTime.now())
-                .id(Generators.timeBasedGenerator().generate().toString())
+                .id(AceUUIDUtils.generateTimeUUIDShort32())
                 .rowVersion(1)
                 .updateTime(LocalDateTime.now())
                 .registerSource(request.getSourceEnum().getCode())
@@ -159,7 +156,7 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
                 .build();
         AccountEvent accountEvent = AccountEvent
                 .builder()
-                .id(Generators.timeBasedGenerator().generate().toString())
+                .id(AceUUIDUtils.generateTimeUUIDShort32())
                 .rowVersion(1)
                 .eventType(AccountEventEventTypeEnum.REGISTER.getCode())
                 .updateTime(LocalDateTime.now())

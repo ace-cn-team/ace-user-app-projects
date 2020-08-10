@@ -10,8 +10,8 @@ import ace.fw.util.BusinessErrorUtils;
 import ace.user.app.logic.api.core.util.PasswordUtils;
 import ace.user.app.logic.define.constants.UserLogicConstants;
 import ace.user.app.logic.define.enums.UserLogicBusinessErrorEnum;
-import ace.user.app.logic.define.module.identity.register.request.RegisterByUserNameRequest;
-import ace.user.app.logic.define.module.identity.register.response.RegisterByUserNameResponse;
+import ace.user.app.logic.define.model.request.identity.register.RegisterByUserNameRequest;
+import ace.user.app.logic.define.model.response.identity.register.RegisterByUserNameResponse;
 import ace.user.base.define.dao.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class RegisterByUserNameBiz extends AbstractRegisterCoreBiz<RegisterByUse
                         CaptchaVerifyCodeId.builder()
                                 .bizType(UserLogicConstants.CAPTCHA_BIZ_TYPE_REGISTER)
                                 .appId(request.getAppId())
-                                .bizId(request.getVerifyCodeBizID())
+                                .bizId(request.getVerifyCodeBizId())
                                 .build()
                 );
         Boolean isCheckPass = captchaBaseApi.check(checkRequest).check();

@@ -1,7 +1,8 @@
 package ace.user.app.logic.api.core.util;
 
-import ace.fw.utils.AceCodecUtils;
-import ace.fw.utils.AceRandomUtils;
+
+import ace.fw.util.AceCodecUtils;
+import ace.fw.util.AceRandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 

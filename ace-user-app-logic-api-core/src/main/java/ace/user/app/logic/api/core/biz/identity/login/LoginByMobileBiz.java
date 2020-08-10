@@ -5,9 +5,8 @@ import ace.account.base.define.dao.enums.account.AccountBizTypeEnum;
 import ace.account.base.define.dao.model.entity.Account;
 import ace.account.base.define.enums.LoginTypeEnum;
 import ace.account.base.define.model.request.FindByAppIdAndMobileRequest;
-import ace.account.base.define.model.request.FindByAppIdAndUserNameRequest;
-import ace.user.app.logic.define.module.identity.login.request.LoginByMobileRequest;
-import ace.user.app.logic.define.module.identity.login.response.LoginByMobileResponse;
+import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
+import ace.user.app.logic.define.model.response.identity.login.LoginByMobileResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Component;
  * @author Caspar
  * @contract 279397942@qq.com
  * @create 2020/2/25 14:51
- * @description
+ * @description 手机登录核心逻辑
  */
 @Component
 @Slf4j

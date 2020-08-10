@@ -12,10 +12,6 @@
     <artifactId>ace-user-app-logic-api-autoconfigure</artifactId>
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.ace</groupId>
             <artifactId>ace-user-app-logic-api-core</artifactId>
         </dependency>
@@ -23,6 +19,10 @@
         <dependency>
             <groupId>org.ace</groupId>
             <artifactId>ace-account-base-api-client-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-user-base-api-client-autoconfigure</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>
@@ -39,11 +39,19 @@
 
         <dependency>
             <groupId>org.ace</groupId>
+            <artifactId>ace-fw-ms-feign-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
             <artifactId>ace-fw-log4j2-autoconfigure</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-fw-ms-discovery-client-autoconfigure</artifactId>
+            <artifactId>ace-fw-logic-common-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
     </dependencies>
 

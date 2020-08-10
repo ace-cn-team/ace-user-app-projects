@@ -20,7 +20,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @description
  */
 @NotBlank(message = "请输入" + PasswordConstraint.FIELD_NAME)
-@Pattern(regexp = PatternConstants.PASSWORD, message = "请输入正确的" + PasswordConstraint.FIELD_NAME)
+@Pattern(regexp = PatternConstants.PASSWORD, message = "请输入正确的" + PasswordConstraint.FIELD_NAME +
+        ",必须包含大写字母、小写字母、数字与特殊符号的6至32位字符组合")
 @Documented
 @Constraint(validatedBy = {})
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
