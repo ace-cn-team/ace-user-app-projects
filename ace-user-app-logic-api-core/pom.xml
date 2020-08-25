@@ -27,7 +27,7 @@
 
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-account-base-api</artifactId>
+            <artifactId>ace-authentication-base-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>
@@ -53,7 +53,6 @@
             <groupId>org.ace</groupId>
             <artifactId>ace-fw-utils-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.fasterxml.uuid</groupId>
             <artifactId>java-uuid-generator</artifactId>

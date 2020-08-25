@@ -18,7 +18,7 @@
 
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-account-base-api-client-autoconfigure</artifactId>
+            <artifactId>ace-authentication-base-api-client-autoconfigure</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>

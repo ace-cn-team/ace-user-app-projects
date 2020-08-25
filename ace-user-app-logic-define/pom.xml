@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-account-base-define</artifactId>
+            <artifactId>ace-authentication-base-define</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>

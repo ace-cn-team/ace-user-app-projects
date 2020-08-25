@@ -1,7 +1,7 @@
 package ace.user.app.logic.define.model.request.identity.register;
 
-import ace.account.base.define.dao.enums.account.AccountRegisterSourceEnum;
-import ace.account.base.define.enums.LoginSourceEnum;
+import ace.authentication.base.define.dao.enums.account.AccountRegisterSourceEnum;
+import ace.authentication.base.define.enums.LoginSourceEnum;
 import ace.common.base.define.model.bo.IAppId;
 import ace.fw.util.AceEnumUtils;
 

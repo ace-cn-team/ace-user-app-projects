@@ -4,6 +4,7 @@ import ace.cas.base.api.facade.OAuth2BaseApiFacade;
 import ace.cas.base.define.model.bo.OAuth2Profile;
 import ace.cas.base.define.model.request.facade.OAuth2GetProfileFacadeRequest;
 import ace.fw.model.response.GenericResponseExt;
+import ace.fw.util.GenericResponseExtUtils;
 import ace.user.app.logic.define.model.request.identity.GetCurrentUserRequest;
 import ace.user.app.logic.define.model.response.identity.GetCurrentUserResponse;
 import ace.user.base.api.cache.UserCacheClientBaseApi;
@@ -31,7 +32,7 @@ public class GetCurrentUserBiz {
     @Autowired
     private UserCacheClientBaseApi userCacheClientBaseApi;
 
-    public GetCurrentUserResponse getCurrentUser(GetCurrentUserRequest request) {
+    public GenericResponseExt<GetCurrentUserResponse> getCurrentUser(GetCurrentUserRequest request) {
         OAuth2Profile profile = this.getProfile(request);
 
         User user = userCacheClientBaseApi.findByAppIdAndIdFromMultiCacheOrDb(
@@ -41,7 +42,7 @@ public class GetCurrentUserBiz {
                         .build()
         ).check();
 
-        return GetCurrentUserResponse.builder().user(user).build();
+        return GenericResponseExtUtils.buildSuccessWithData(GetCurrentUserResponse.builder().user(user).build());
     }
 
     private OAuth2Profile getProfile(GetCurrentUserRequest request) {

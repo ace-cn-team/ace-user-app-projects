@@ -1,10 +1,10 @@
 package ace.user.app.logic.api.core.biz.identity.login;
 
-import ace.account.base.api.AccountBaseApi;
-import ace.account.base.define.dao.enums.account.AccountBizTypeEnum;
-import ace.account.base.define.dao.model.entity.Account;
-import ace.account.base.define.enums.LoginTypeEnum;
-import ace.account.base.define.model.request.FindByAppIdAndUserNameRequest;
+import ace.authentication.base.api.AccountBaseApi;
+
+import ace.authentication.base.define.dao.model.entity.Account;
+import ace.authentication.base.define.enums.LoginTypeEnum;
+import ace.authentication.base.define.model.request.FindByAppIdAndUserNameRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
 import ace.user.app.logic.define.model.response.identity.login.LoginByUserNameResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class LoginByUserNameBiz extends AbstractLoginCoreBiz<LoginByUserNameRequ
     private AccountBaseApi accountBaseApi;
 
     @Override
-    protected LoginByUserNameResponse newResponse() {
+    protected LoginByUserNameResponse newLoginResponse() {
         return new LoginByUserNameResponse();
     }
 
@@ -40,7 +40,6 @@ public class LoginByUserNameBiz extends AbstractLoginCoreBiz<LoginByUserNameRequ
                 FindByAppIdAndUserNameRequest.builder()
                         .appId(request.getAppId())
                         .userName(request.getUserName())
-                        .bizType(AccountBizTypeEnum.USER.getCode())
                         .build()
         ).check();
         return account;

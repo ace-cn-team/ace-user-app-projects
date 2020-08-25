@@ -1,6 +1,6 @@
 package ace.user.app.logic.define.model.request.identity.register;
 
-import ace.account.base.define.constraint.AccountRegisterSourceConstraint;
+import ace.authentication.base.define.constraint.AccountRegisterSourceConstraint;
 import ace.common.base.define.model.constraint.AppIdConstraint;
 import ace.common.base.define.model.constraint.MobileConstraint;
 import ace.user.app.logic.define.constraint.InviterCodeConstraint;

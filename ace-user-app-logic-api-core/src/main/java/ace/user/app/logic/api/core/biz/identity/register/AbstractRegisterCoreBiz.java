@@ -1,32 +1,34 @@
 package ace.user.app.logic.api.core.biz.identity.register;
 
 
-import ace.account.base.api.AccountEventBaseApi;
-import ace.account.base.api.IdentityBaseApi;
-import ace.account.base.define.dao.enums.account.AccountBizTypeEnum;
-import ace.account.base.define.dao.enums.account.AccountStateEnum;
-import ace.account.base.define.dao.enums.accountevent.AccountEventEventTypeEnum;
-import ace.account.base.define.dao.model.entity.Account;
-import ace.account.base.define.dao.model.entity.AccountEvent;
-import ace.account.base.define.enums.AccountBusinessErrorEnum;
-import ace.account.base.define.model.request.RegisterRequest;
-import ace.account.base.define.model.vo.RegisterSuccessEventLogParams;
+import ace.authentication.base.api.AccountEventBaseApi;
+import ace.authentication.base.api.IdentityBaseApi;
+
+import ace.authentication.base.define.dao.enums.account.AccountStateEnum;
+import ace.authentication.base.define.dao.enums.accountevent.AccountEventEventTypeEnum;
+import ace.authentication.base.define.dao.model.entity.Account;
+import ace.authentication.base.define.dao.model.entity.AccountEvent;
+import ace.authentication.base.define.enums.AccountBusinessErrorEnum;
+import ace.authentication.base.define.model.request.RegisterRequest;
+import ace.authentication.base.define.model.vo.RegisterSuccessEventLogParams;
 import ace.cas.base.api.facade.OAuth2BaseApiFacade;
+import ace.fw.enums.SystemCodeEnum;
 import ace.fw.json.JsonUtils;
 import ace.fw.logic.common.util.AceUUIDUtils;
+import ace.fw.model.response.GenericResponseExt;
 import ace.fw.util.AceLocalDateTimeUtils;
 import ace.fw.util.BusinessErrorUtils;
 import ace.fw.utils.web.WebUtils;
 import ace.user.app.logic.api.core.converter.OAuthTokenConverter;
 import ace.user.app.logic.api.core.provider.OAuth2Provider;
 import ace.user.app.logic.api.core.util.PasswordUtils;
+import ace.user.app.logic.define.constants.UserLogicConstants;
 import ace.user.app.logic.define.model.request.identity.register.IRegisterRequest;
 import ace.user.app.logic.define.model.response.identity.register.IRegisterResponse;
 import ace.user.app.logic.define.model.vo.OAuth2TokenVo;
 import ace.user.base.api.UserBaseApi;
 import ace.user.base.define.dao.entity.User;
 import ace.user.base.define.dao.enums.user.UserSexEnum;
-import com.fasterxml.uuid.Generators;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +59,7 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
     @Autowired
     private OAuth2Provider oAuth2Provider;
 
-    public Response register(Request request) {
+    public GenericResponseExt<Response> register(Request request) {
         // 账号是否已存在
         this.checkExist(request);
         // 检查相关信息
@@ -68,12 +70,21 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
         this.saveUser(request, savedAccount);
         // 生成登录信息
         OAuth2TokenVo oauth2TokenVo = this.getOAuth2Token(savedAccount);
-        // 创建返回结果
-        Response response = this.newResponse();
-        // 配置返回结果
-        this.configResponse(response, request, savedAccount, oauth2TokenVo);
+        // 创建返回业务结果
+        Response registerResponse = this.newRegisterResponse();
+        // 配置返回业务结果
+        this.configResponse(registerResponse, request, savedAccount, oauth2TokenVo);
         // 生成返回结果
-        return response;
+        GenericResponseExt<Response> responseExt = this.newGenericResponseExt(registerResponse, request, savedAccount, oauth2TokenVo);
+        return responseExt;
+    }
+
+    protected GenericResponseExt<Response> newGenericResponseExt(Response registerResponse, Request request, Account savedAccount, OAuth2TokenVo oauth2TokenVo) {
+        GenericResponseExt<Response> responseExt = new GenericResponseExt<>();
+        responseExt.setData(registerResponse);
+        responseExt.setCode(SystemCodeEnum.SUCCESS.getCode());
+        responseExt.setMessage(SystemCodeEnum.SUCCESS.getDesc());
+        return responseExt;
     }
 
     /**
@@ -135,7 +146,6 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
                 .nickName(nickName)
                 .state(AccountStateEnum.ENABLE.getCode())
                 .userName(null)
-                .bizType(AccountBizTypeEnum.USER.getCode())
                 .createTime(LocalDateTime.now())
                 .id(AceUUIDUtils.generateTimeUUIDShort32())
                 .rowVersion(1)
@@ -149,10 +159,11 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
         RegisterSuccessEventLogParams eventParams = RegisterSuccessEventLogParams.builder()
                 .accountId(account.getId())
                 .appId(request.getAppId())
-                .bizType(AccountBizTypeEnum.USER.getCode())
                 .registerTime(LocalDateTime.now())
                 .registerSource(request.getSourceEnum().getCode())
                 .ip(WebUtils.getIpAddr())
+                .paramsId(UserLogicConstants.PARAMS_ID_REGISTER_EVENT)
+                .params(null)
                 .build();
         AccountEvent accountEvent = AccountEvent
                 .builder()
@@ -176,10 +187,9 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
         ).check();
 
         log.info(
-                String.format("[accountId=%s][appId=%s][bizType=%s][registerSource=%s]注册成功",
+                String.format("[accountId=%s][appId=%s][registerSource=%s]注册成功",
                         account.getId(),
                         account.getAppId(),
-                        account.getBizType(),
                         request.getSourceEnum().getCode()
                 )
         );
@@ -254,7 +264,7 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
      *
      * @return
      */
-    protected abstract Response newResponse();
+    protected abstract Response newRegisterResponse();
 
     /**
      * 获取昵称

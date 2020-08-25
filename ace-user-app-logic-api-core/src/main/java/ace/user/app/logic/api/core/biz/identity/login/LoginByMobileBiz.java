@@ -1,10 +1,10 @@
 package ace.user.app.logic.api.core.biz.identity.login;
 
-import ace.account.base.api.AccountBaseApi;
-import ace.account.base.define.dao.enums.account.AccountBizTypeEnum;
-import ace.account.base.define.dao.model.entity.Account;
-import ace.account.base.define.enums.LoginTypeEnum;
-import ace.account.base.define.model.request.FindByAppIdAndMobileRequest;
+import ace.authentication.base.api.AccountBaseApi;
+
+import ace.authentication.base.define.dao.model.entity.Account;
+import ace.authentication.base.define.enums.LoginTypeEnum;
+import ace.authentication.base.define.model.request.FindByAppIdAndMobileRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
 import ace.user.app.logic.define.model.response.identity.login.LoginByMobileResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class LoginByMobileBiz extends AbstractLoginCoreBiz<LoginByMobileRequest,
     private AccountBaseApi accountBaseApi;
 
     @Override
-    protected LoginByMobileResponse newResponse() {
+    protected LoginByMobileResponse newLoginResponse() {
         return new LoginByMobileResponse();
     }
 
@@ -40,7 +40,6 @@ public class LoginByMobileBiz extends AbstractLoginCoreBiz<LoginByMobileRequest,
                 FindByAppIdAndMobileRequest.builder()
                         .appId(request.getAppId())
                         .mobile(request.getMobile())
-                        .bizType(AccountBizTypeEnum.USER.getCode())
                         .build()
         ).check();
         return account;

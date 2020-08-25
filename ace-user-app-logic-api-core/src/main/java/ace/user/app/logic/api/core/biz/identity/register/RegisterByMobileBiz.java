@@ -1,9 +1,9 @@
 package ace.user.app.logic.api.core.biz.identity.register;
 
-import ace.account.base.define.dao.enums.account.AccountBizTypeEnum;
-import ace.account.base.define.dao.model.entity.Account;
-import ace.account.base.define.enums.AccountBusinessErrorEnum;
-import ace.account.base.define.model.request.ExistsByMobileRequest;
+
+import ace.authentication.base.define.dao.model.entity.Account;
+import ace.authentication.base.define.enums.AccountBusinessErrorEnum;
+import ace.authentication.base.define.model.request.ExistsByMobileRequest;
 import ace.fw.util.BusinessErrorUtils;
 import ace.sms.base.api.SmsVerifyCodeBaseApi;
 import ace.sms.define.base.model.bo.VerifyCodeId;
@@ -46,7 +46,6 @@ public class RegisterByMobileBiz extends AbstractRegisterCoreBiz<RegisterByMobil
         ExistsByMobileRequest existsByMobileRequest = ExistsByMobileRequest
                 .builder()
                 .appId(request.getAppId())
-                .bizType(AccountBizTypeEnum.USER.getCode())
                 .mobile(request.getMobile())
                 .build();
         return super.getIdentityBaseApi().existsByMobile(existsByMobileRequest).check();
@@ -58,7 +57,7 @@ public class RegisterByMobileBiz extends AbstractRegisterCoreBiz<RegisterByMobil
     }
 
     @Override
-    protected RegisterByMobileResponse newResponse() {
+    protected RegisterByMobileResponse newRegisterResponse() {
         return new RegisterByMobileResponse();
     }
 

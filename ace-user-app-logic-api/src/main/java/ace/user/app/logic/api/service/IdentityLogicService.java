@@ -3,6 +3,9 @@ package ace.user.app.logic.api.service;
 
 import ace.fw.model.response.GenericResponseExt;
 import ace.user.app.logic.define.model.request.identity.LogoutRequest;
+import ace.user.app.logic.define.model.request.identity.modifypassword.ModifyPasswordByNoLimitRequest;
+import ace.user.app.logic.define.model.request.identity.modifypassword.ModifyPasswordByOldPasswordRequest;
+import ace.user.app.logic.define.model.request.identity.modifypassword.ModifyPasswordBySmsVerifyCodeRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByUserNameRequest;
@@ -69,4 +72,25 @@ public interface IdentityLogicService {
      * @param request
      */
     GenericResponseExt<Boolean> logout(@Valid LogoutRequest request);
+
+    /**
+     * 根据旧密码修改密码
+     *
+     * @return
+     */
+    GenericResponseExt<Boolean> modifyPasswordByOldPassword(@Valid ModifyPasswordByOldPasswordRequest request);
+
+    /**
+     * 根据短信验证码修改密码
+     *
+     * @return
+     */
+    GenericResponseExt<Boolean> modifyPasswordBySmsVerifyCode(@Valid ModifyPasswordBySmsVerifyCodeRequest request);
+
+    /**
+     * 没有限制，修改密码
+     *
+     * @return
+     */
+    GenericResponseExt<Boolean> modifyPasswordByNoLimit(@Valid ModifyPasswordByNoLimitRequest request);
 }

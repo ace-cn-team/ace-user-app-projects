@@ -1,8 +1,9 @@
 package ace.user.app.logic.api.core.biz.user;
 
-import ace.account.base.api.AccountBaseApi;
-import ace.account.base.define.dao.model.entity.Account;
-import ace.account.base.define.enums.AccountBusinessErrorEnum;
+import ace.authentication.base.api.AccountBaseApi;
+import ace.authentication.base.define.dao.model.entity.Account;
+import ace.authentication.base.define.enums.AccountBusinessErrorEnum;
+import ace.fw.restful.base.api.constant.RestApiConstants;
 import ace.fw.util.BusinessErrorUtils;
 import ace.user.app.logic.define.enums.UserLogicBusinessErrorEnum;
 import ace.user.app.logic.define.model.request.user.ModifyUserInfoRequest;
@@ -40,9 +41,10 @@ public class ModifyUserInfoBiz {
     }
 
     private void update(ModifyUserInfoRequest request, User originalUser) {
+
         User modifyUser = User.builder()
                 .id(originalUser.getId())
-                .rowVersion(originalUser.getRowVersion())
+                .rowVersion(RestApiConstants.VERSION_AUTO_UPDATE_INTEGER_VALUE)
                 .sex(request.getSex())
                 .avatarUrl(request.getAvatarUrl())
                 .signature(request.getSignature())
@@ -50,7 +52,7 @@ public class ModifyUserInfoBiz {
                 .birthday(request.getBirthday())
                 .build();
 
-        boolean result = userBaseApi.updateById(modifyUser).check();
+        boolean result = userBaseApi.updateByIdVersionAutoUpdate(modifyUser).check();
 
         if (result == false) {
             BusinessErrorUtils.throwNew(UserLogicBusinessErrorEnum.DATA_EXPIRE);

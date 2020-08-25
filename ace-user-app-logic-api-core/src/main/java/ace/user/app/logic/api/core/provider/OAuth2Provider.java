@@ -1,6 +1,6 @@
 package ace.user.app.logic.api.core.provider;
 
-import ace.account.base.define.dao.model.entity.Account;
+import ace.authentication.base.define.dao.model.entity.Account;
 import ace.cas.base.api.facade.OAuth2BaseApiFacade;
 import ace.cas.base.define.model.bo.OAuth2Profile;
 import ace.cas.base.define.model.bo.OAuth2Token;

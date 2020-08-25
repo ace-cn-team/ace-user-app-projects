@@ -1,29 +1,23 @@
 package ace.user.app.logic.api.core.junit;
 
+import ace.authentication.base.api.IdentityBaseApi;
 import ace.authentication.base.define.dao.enums.account.AccountRegisterSourceEnum;
 import ace.authentication.base.define.enums.LoginSourceEnum;
-import ace.fw.data.model.PageResponse;
-import ace.fw.data.model.Sort;
-import ace.fw.data.model.request.resful.PageQueryRequest;
+import ace.authentication.base.define.model.request.ExistsByMobileRequest;
 import ace.fw.logic.common.util.AceUUIDUtils;
 import ace.fw.model.response.GenericResponseExt;
 import ace.fw.util.AceRandomUtils;
-import ace.fw.util.DateUtils;
 import ace.user.app.logic.api.service.IdentityLogicService;
-import ace.user.app.logic.api.service.UserLogicService;
 import ace.user.app.logic.define.model.request.identity.GetCurrentUserRequest;
 import ace.user.app.logic.define.model.request.identity.LogoutRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByMobileRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByUserNameRequest;
-import ace.user.app.logic.define.model.request.user.ModifyUserInfoRequest;
 import ace.user.app.logic.define.model.response.identity.GetCurrentUserResponse;
 import ace.user.app.logic.define.model.response.identity.login.LoginByMobileResponse;
 import ace.user.app.logic.define.model.response.identity.login.LoginByUserNameResponse;
 import ace.user.app.logic.define.model.vo.OAuth2TokenVo;
-import ace.user.base.api.UserBaseApi;
-import ace.user.base.define.dao.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -33,8 +27,6 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Arrays;
 
 /**
  * @author Caspar
@@ -46,51 +38,52 @@ import java.util.Arrays;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JUnitApplication.class)
 @FixMethodOrder(value = MethodSorters.NAME_ASCENDING)
-public class TestUserLogicService {
+public class TestIdentityBaseApiService {
 
+    private final static String TEST_MOBILE = "15099975787";
+    private final static String TEST_APP_ID = "test_app_id";
+    private final static String TEST_PASSWORD = "123456";
+    private final static String TEST_SMS_VERIFY_CODE = "888888";
     @Autowired
-    private UserLogicService userLogicService;
-    @Autowired
-    private UserBaseApi userBaseApi;
+    private IdentityBaseApi identityBaseApi;
 
     /**
      * 测试手机号码注册
      */
     @Test
-    public void test_0001_modifyUserInfo() {
-        User user = userBaseApi.page(PageQueryRequest.builder()
-                .pageIndex(1)
-                .pageSize(1)
-                .sorts(Arrays.asList(
-                        Sort.builder()
-                                .asc(true)
-                                .field(User.ID)
-                                .build()
-                        )
-                )
-                .build()
-        ).check().getData().get(0);
+    public void test_0001_existByMobile() {
+        log.debug("222");
+        identityBaseApi.existsByMobile(ExistsByMobileRequest.builder()
+                .appId("1")
+                .mobile("15099975786")
+                .build());
 
-        String avatarUrl = DateUtils.getNowFormat(DateUtils.FROMAT_yyyyMMddHHmmssSS);
-        String nickName = avatarUrl;
-
-        userLogicService.modifyUserInfo(ModifyUserInfoRequest.builder()
-                .avatarUrl(avatarUrl)
-                .birthday(null)
-                .nickName(nickName)
-                .accountId(user.getId())
-                .build()
-        ).check();
-
-        User updateUser = userBaseApi.getById(user.getId()).check();
-
-        Assert.assertEquals(updateUser.getAvatarUrl(), avatarUrl);
-        Assert.assertEquals(updateUser.getNickName(), nickName);
-
-        Assert.assertNotEquals(user.getAvatarUrl(), avatarUrl);
-        Assert.assertNotEquals(user.getNickName(), nickName);
-
-        Assert.assertEquals(user.getSignature(), updateUser.getSignature());
     }
 
+
+    private static String generateTestMobile() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("1");
+        sb.append(AceRandomUtils.randomNumber(10));
+
+        return sb.toString();
+    }
+
+    private final static RegisterByMobileRequest registerByMobileRequest = RegisterByMobileRequest.builder()
+            .appId(TEST_APP_ID)
+            .invitorCode("")
+            .mobile(generateTestMobile())
+            .password(TEST_PASSWORD)
+            .sourceType(AccountRegisterSourceEnum.PC.getCode())
+            .verifyCode(TEST_SMS_VERIFY_CODE)
+            .build();
+    private final static RegisterByUserNameRequest registerByUserNameRequest = RegisterByUserNameRequest.builder()
+            .appId(TEST_APP_ID)
+            .invitorCode("")
+            .userName(AceUUIDUtils.generateTimeUUIDShort32())
+            .password(TEST_PASSWORD)
+            .sourceType(AccountRegisterSourceEnum.PC.getCode())
+            .verifyCode(TEST_SMS_VERIFY_CODE)
+            .verifyCodeBizId(TEST_APP_ID)
+            .build();
 }

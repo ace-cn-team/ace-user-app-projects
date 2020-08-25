@@ -31,13 +31,13 @@
         <module>ace-user-app-web</module>
     </modules>
     <properties>
-        <ace.fw.version>1.0.0.21</ace.fw.version>
-        <ace.dependency.management.version>1.0.0.11</ace.dependency.management.version>
-        <ace.account.base.version>1.0.0.13</ace.account.base.version>
-        <ace.cas.base.version>1.0.0.9</ace.cas.base.version>
+        <ace.fw.version>1.0.0.39</ace.fw.version>
+        <ace.dependency.management.version>1.0.0.12</ace.dependency.management.version>
+        <ace.authentication.base.version>1.0.0.7</ace.authentication.base.version>
+        <ace.cas.base.version>1.0.0.11</ace.cas.base.version>
         <ace.sms.base.version>1.0.0.12</ace.sms.base.version>
         <ace.captcha.base.version>1.0.0.4</ace.captcha.base.version>
-        <ace.user.base.version>1.0.0.5</ace.user.base.version>
+        <ace.user.base.version>1.0.0.7</ace.user.base.version>
         <ace.common.base.version>1.0.0.11</ace.common.base.version>
     </properties>
     <dependencyManagement>
@@ -99,13 +99,13 @@
 
             <dependency>
                 <groupId>org.ace</groupId>
-                <artifactId>ace-account-base-api</artifactId>
-                <version>${ace.account.base.version}</version>
+                <artifactId>ace-authentication-base-api</artifactId>
+                <version>${ace.authentication.base.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.ace</groupId>
-                <artifactId>ace-account-base-define</artifactId>
-                <version>${ace.account.base.version}</version>
+                <artifactId>ace-authentication-base-define</artifactId>
+                <version>${ace.authentication.base.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.ace</groupId>
@@ -140,8 +140,8 @@
 
             <dependency>
                 <groupId>org.ace</groupId>
-                <artifactId>ace-account-base-api-client-autoconfigure</artifactId>
-                <version>${ace.account.base.version}</version>
+                <artifactId>ace-authentication-base-api-client-autoconfigure</artifactId>
+                <version>${ace.authentication.base.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.ace</groupId>
@@ -178,11 +178,6 @@
             <dependency>
                 <groupId>org.ace</groupId>
                 <artifactId>ace-fw-ms-application-autoconfigure</artifactId>
-                <version>${ace.fw.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ace</groupId>
-                <artifactId>ace-fw-ms-discovery-client-autoconfigure</artifactId>
                 <version>${ace.fw.version}</version>
             </dependency>
         </dependencies>

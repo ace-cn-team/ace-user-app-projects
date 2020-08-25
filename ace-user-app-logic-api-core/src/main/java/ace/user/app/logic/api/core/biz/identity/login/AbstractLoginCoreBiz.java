@@ -1,24 +1,29 @@
 package ace.user.app.logic.api.core.biz.identity.login;
 
-import ace.account.base.api.AccountEventBaseApi;
-import ace.account.base.define.dao.enums.account.AccountBizTypeEnum;
-import ace.account.base.define.dao.enums.account.AccountStateEnum;
-import ace.account.base.define.dao.enums.accountevent.AccountEventEventTypeEnum;
-import ace.account.base.define.dao.model.entity.Account;
-import ace.account.base.define.dao.model.entity.AccountEvent;
-import ace.account.base.define.enums.AccountBusinessErrorEnum;
-import ace.account.base.define.enums.LoginTypeEnum;
-import ace.account.base.define.model.vo.LoginSuccessEventLogParams;
+import ace.authentication.base.api.AccountEventBaseApi;
+
+import ace.authentication.base.define.dao.enums.account.AccountStateEnum;
+import ace.authentication.base.define.dao.enums.accountevent.AccountEventEventTypeEnum;
+import ace.authentication.base.define.dao.model.entity.Account;
+import ace.authentication.base.define.dao.model.entity.AccountEvent;
+import ace.authentication.base.define.enums.LoginTypeEnum;
+import ace.authentication.base.define.model.vo.LoginSuccessEventLogParams;
 import ace.cas.base.api.facade.OAuth2BaseApiFacade;
+import ace.fw.enums.SystemCodeEnum;
 import ace.fw.json.JsonUtils;
 import ace.fw.logic.common.util.AceUUIDUtils;
+import ace.fw.model.response.GenericResponseExt;
 import ace.fw.util.BusinessErrorUtils;
 import ace.user.app.logic.api.core.converter.OAuthTokenConverter;
 import ace.user.app.logic.api.core.provider.OAuth2Provider;
 import ace.user.app.logic.api.core.util.PasswordUtils;
+import ace.user.app.logic.define.constants.UserLogicConstants;
+import ace.user.app.logic.define.enums.UserLogicBusinessErrorEnum;
 import ace.user.app.logic.define.model.request.identity.login.ILoginCoreRequest;
 import ace.user.app.logic.define.model.response.identity.login.ILoginCoreResponse;
 import ace.user.app.logic.define.model.vo.OAuth2TokenVo;
+import ace.user.base.api.UserBaseApi;
+import ace.user.base.define.dao.entity.User;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,22 +49,51 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
     private OAuthTokenConverter oAuthTokenConverter;
     @Autowired
     private OAuth2Provider oAuth2Provider;
+    @Autowired
+    private UserBaseApi userBaseApi;
 
-    public Response login(Request request) {
+    public GenericResponseExt<Response> login(Request request) {
         // 查找账号
         Account account = this.findAccount(request);
         // 检查账号登录信息、账号状态等相关信息
         this.checkAccount(request, account);
         // 创建token
         OAuth2TokenVo token = this.getOAuth2Token(account);
-        // 创建返回数据
-        Response response = this.newResponse();
-        // 配置返回数据
-        this.configResponse(response, request, account, token);
+        // 创建返回业务数据
+        Response loginCoreResponse = this.newLoginResponse();
+        // 配置返回业务数据
+        this.configResponse(loginCoreResponse, request, account, token);
+        // 初始化返回结果
+        GenericResponseExt<Response> responseExt = this.newGenericResponseExt(loginCoreResponse, request, account);
+        // 验证是否存在用户信息
+        this.checkUserIsExistNoThrowable(responseExt, loginCoreResponse, request, account);
         // 登录事件入库,屏蔽所有异常
         this.saveLoginEventNoThrowable(request, account);
 
-        return response;
+        return responseExt;
+    }
+
+    protected GenericResponseExt<Response> newGenericResponseExt(Response loginCoreResponse, Request request, Account account) {
+        GenericResponseExt<Response> responseExt = new GenericResponseExt<>();
+        responseExt.setData(loginCoreResponse);
+        responseExt.setCode(SystemCodeEnum.SUCCESS.getCode());
+        responseExt.setMessage(SystemCodeEnum.SUCCESS.getDesc());
+        return responseExt;
+    }
+
+    /**
+     * 验证是否存在用户信息
+     *
+     * @param response
+     * @param request
+     * @param account
+     */
+    protected void checkUserIsExistNoThrowable(GenericResponseExt<Response> responseExt, ILoginCoreResponse response, Request request, Account account) {
+        User user = userBaseApi.getById(account.getId()).check();
+        if (user == null) {
+            responseExt.setCode(UserLogicBusinessErrorEnum.USER_NOT_EXIST.getCode());
+            responseExt.setMessage(UserLogicBusinessErrorEnum.USER_NOT_EXIST.getDesc());
+        }
     }
 
     /**
@@ -67,7 +101,7 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
      * @param account
      * @param oAuth2TokenVo
      */
-    protected void configResponse(Response response, Request request, Account account, OAuth2TokenVo oAuth2TokenVo) {
+    protected void configResponse(ILoginCoreResponse response, Request request, Account account, OAuth2TokenVo oAuth2TokenVo) {
         response.setToken(oAuth2TokenVo);
     }
 
@@ -86,7 +120,7 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
      *
      * @return
      */
-    protected abstract Response newResponse();
+    protected abstract Response newLoginResponse();
 
     /**
      * 获取登录类型
@@ -112,10 +146,9 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
      */
     protected void saveLoginEventNoThrowable(Request request, Account account) {
         log.info(
-                String.format("[account=%s][appId=%s][bizType=%s][loginSource=%s][loginType=%s]登录成功",
+                String.format("[account=%s][appId=%s][loginSource=%s][loginType=%s]登录成功",
                         account.getId(),
                         account.getAppId(),
-                        account.getBizType(),
                         request.getLoginSourceEnum().getCode(),
                         this.getLoginTypeEnum().getDesc()
                 )
@@ -123,10 +156,11 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
         LoginSuccessEventLogParams eventParams = LoginSuccessEventLogParams.builder()
                 .accountId(account.getId())
                 .appId(request.getAppId())
-                .bizType(AccountBizTypeEnum.USER.getCode())
                 .loginTime(LocalDateTime.now())
                 .ip(ace.fw.utils.web.WebUtils.getIpAddr())
                 .loginSource(request.getLoginSourceEnum().getCode())
+                .paramsId(UserLogicConstants.PARAMS_ID_LOGIN_EVENT_)
+                .params(null)
                 .build();
         AccountEvent accountEvent = AccountEvent
                 .builder()
@@ -155,14 +189,14 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
     protected void checkAccount(Request request, Account account) {
 
         if (account == null) {
-            BusinessErrorUtils.throwNew(AccountBusinessErrorEnum.PASSWORD_NOT_EQUAL);
+            BusinessErrorUtils.throwNew(UserLogicBusinessErrorEnum.PASSWORD_NOT_EQUAL);
         }
 
         if (passwordUtils.isNotEquals(
                 account.getPassword(),
                 request.getPassword(),
                 account.getPasswordEncryptionFactor())) {
-            BusinessErrorUtils.throwNew(AccountBusinessErrorEnum.PASSWORD_NOT_EQUAL);
+            BusinessErrorUtils.throwNew(UserLogicBusinessErrorEnum.PASSWORD_NOT_EQUAL);
         }
 
         this.checkState(account);
@@ -176,19 +210,19 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
     protected void checkState(Account account) {
 
         if (account.getExpireTime().isBefore(LocalDateTime.now())) {
-            BusinessErrorUtils.throwNew(AccountBusinessErrorEnum.EXPIRE_ACCOUNT);
+            BusinessErrorUtils.throwNew(UserLogicBusinessErrorEnum.EXPIRE_ACCOUNT);
         }
         if (AccountStateEnum.DISABLE.getCode().equals(account.getState())) {
-            BusinessErrorUtils.throwNew(AccountBusinessErrorEnum.DISABLE_ACCOUNT);
+            BusinessErrorUtils.throwNew(UserLogicBusinessErrorEnum.DISABLE_ACCOUNT);
         }
         if (AccountStateEnum.EXPIRED.getCode().equals(account.getState())) {
-            BusinessErrorUtils.throwNew(AccountBusinessErrorEnum.EXPIRE_ACCOUNT);
+            BusinessErrorUtils.throwNew(UserLogicBusinessErrorEnum.EXPIRE_ACCOUNT);
         }
         if (AccountStateEnum.MUST_CHANGE_PASSWORD.getCode().equals(account.getState())) {
-            BusinessErrorUtils.throwNew(AccountBusinessErrorEnum.MUST_CHANGE_PASSWORD);
+            BusinessErrorUtils.throwNew(UserLogicBusinessErrorEnum.MUST_CHANGE_PASSWORD);
         }
         if (AccountStateEnum.LOCKED.getCode().equals(account.getState())) {
-            BusinessErrorUtils.throwNew(AccountBusinessErrorEnum.LOCK_ACCOUNT);
+            BusinessErrorUtils.throwNew(UserLogicBusinessErrorEnum.LOCK_ACCOUNT);
         }
     }
 }

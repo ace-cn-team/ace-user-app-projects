@@ -1,15 +1,30 @@
 package ace.user.app.logic.api.core.junit;
 
-import ace.account.base.define.dao.enums.account.AccountRegisterSourceEnum;
+import ace.authentication.base.api.AccountBaseApi;
+import ace.authentication.base.define.dao.enums.account.AccountRegisterSourceEnum;
 
-import ace.account.base.define.enums.LoginSourceEnum;
+import ace.authentication.base.define.dao.model.entity.Account;
+import ace.authentication.base.define.enums.LoginSourceEnum;
+import ace.fw.data.model.GenericCondition;
+import ace.fw.data.model.LogicalOpConstVal;
+import ace.fw.data.model.RelationalOpConstVal;
+import ace.fw.data.model.Sort;
+import ace.fw.data.model.request.resful.PageQueryRequest;
 import ace.fw.logic.common.util.AceUUIDUtils;
 import ace.fw.model.response.GenericResponseExt;
 import ace.fw.util.AceRandomUtils;
+import ace.sms.base.api.SmsVerifyCodeBaseApi;
+import ace.sms.define.base.enums.SmsVerifyCodeTypeEnum;
+import ace.sms.define.base.model.bo.VerifyCodeId;
+import ace.sms.define.base.model.request.SendVerifyCodeRequest;
 import ace.user.app.logic.api.service.IdentityLogicService;
+import ace.user.app.logic.define.constants.UserLogicConstants;
 import ace.user.app.logic.define.model.request.identity.LogoutRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
+import ace.user.app.logic.define.model.request.identity.modifypassword.ModifyPasswordByNoLimitRequest;
+import ace.user.app.logic.define.model.request.identity.modifypassword.ModifyPasswordByOldPasswordRequest;
+import ace.user.app.logic.define.model.request.identity.modifypassword.ModifyPasswordBySmsVerifyCodeRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByMobileRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByUserNameRequest;
 import ace.user.app.logic.define.model.request.identity.GetCurrentUserRequest;
@@ -18,6 +33,7 @@ import ace.user.app.logic.define.model.response.identity.login.LoginByUserNameRe
 import ace.user.app.logic.define.model.response.identity.GetCurrentUserResponse;
 import ace.user.app.logic.define.model.vo.OAuth2TokenVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -26,6 +42,9 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Caspar
@@ -45,18 +64,19 @@ public class TestIdentityLogicService {
     private final static String TEST_SMS_VERIFY_CODE = "888888";
     @Autowired
     private IdentityLogicService identityLogicService;
+    @Autowired
+    private AccountBaseApi accountBaseApi;
+    @Autowired
+    private SmsVerifyCodeBaseApi smsVerifyCodeBaseApi;
 
     /**
      * 测试手机号码注册
      */
     @Test
     public void test_0001_registerByMobile() {
-
         OAuth2TokenVo oAuth2TokenVo = identityLogicService.registerByMobile(registerByMobileRequest).check().getToken();
 
-        if (oAuth2TokenVo == null) {
-            throw new RuntimeException();
-        }
+        Assert.assertTrue(StringUtils.isNotBlank(oAuth2TokenVo.getAccessToken()));
     }
 
     /**
@@ -66,9 +86,7 @@ public class TestIdentityLogicService {
     public void test_0002_registerByUserName() {
         OAuth2TokenVo oAuth2TokenVo = identityLogicService.registerByUserName(registerByUserNameRequest).check().getToken();
 
-        if (oAuth2TokenVo == null) {
-            throw new RuntimeException();
-        }
+        Assert.assertTrue(StringUtils.isNotBlank(oAuth2TokenVo.getAccessToken()));
     }
 
     @Test
@@ -138,12 +156,113 @@ public class TestIdentityLogicService {
         Assert.assertNull(currentUserResponse.getData());
     }
 
+    @Test
+    public void test_0007_modifyPasswordByNoLimit() {
+        Account account = this.findAccountFirst();
+
+        Boolean isModifySuccess = identityLogicService.modifyPasswordByNoLimit(ModifyPasswordByNoLimitRequest.builder()
+                .accountId(account.getId())
+                .newPassword(TEST_PASSWORD)
+                .build()
+        ).check();
+        Assert.assertTrue(isModifySuccess);
+
+    }
+
+    @Test
+    public void test_0008_modifyPasswordByOldPassword() {
+        Account account = this.findAccountFirst();
+
+        Boolean isModifySuccess = identityLogicService.modifyPasswordByNoLimit(ModifyPasswordByNoLimitRequest.builder()
+                .accountId(account.getId())
+                .newPassword(TEST_PASSWORD)
+                .build()
+        ).check();
+        Assert.assertTrue(isModifySuccess);
+
+        isModifySuccess = identityLogicService.modifyPasswordByOldPassword(ModifyPasswordByOldPasswordRequest.builder()
+                .accountId(account.getId())
+                .newPassword(TEST_PASSWORD)
+                .oldPassword(TEST_PASSWORD)
+                .build()
+        ).check();
+        Assert.assertTrue(isModifySuccess);
+
+    }
+
+
+    @Test
+    public void test_0009_modifyPasswordBySmsVerifyCode() {
+        Account account = this.findAccountMobileIsNotNullFirst();
+
+        Boolean isModifySuccess = identityLogicService.modifyPasswordByNoLimit(ModifyPasswordByNoLimitRequest.builder()
+                .accountId(account.getId())
+                .newPassword(TEST_PASSWORD)
+                .build()
+        ).check();
+        Assert.assertTrue(isModifySuccess);
+
+
+        VerifyCodeId verifyCodeId = VerifyCodeId.builder()
+                .mobile(account.getMobile())
+                .appId(account.getAppId())
+                .bizType(UserLogicConstants.SMS_VERIFY_CODE_BIZ_TYPE_MODIFY_PASSWORD)
+                .build();
+
+        String smsVerifyCode = smsVerifyCodeBaseApi.send(SendVerifyCodeRequest.builder()
+                .verifyCodeId(verifyCodeId)
+                .smsVerifyCodeType(SmsVerifyCodeTypeEnum.NUMBER.getCode())
+                .verifyCodeLength(6)
+                .build()).check();
+
+        isModifySuccess = identityLogicService.modifyPasswordBySmsVerifyCode(ModifyPasswordBySmsVerifyCodeRequest.builder()
+                .appId(account.getAppId())
+                .newPassword(TEST_PASSWORD)
+                .mobile(account.getMobile())
+                .smsVerifyCode(smsVerifyCode)
+                .build()
+        ).check();
+        Assert.assertTrue(isModifySuccess);
+
+    }
+
     private static String generateTestMobile() {
         StringBuffer sb = new StringBuffer();
         sb.append("1");
         sb.append(AceRandomUtils.randomNumber(10));
 
         return sb.toString();
+    }
+
+    private Account findAccountFirst() {
+        return accountBaseApi.page(PageQueryRequest.builder()
+                .conditions(null)
+                .sorts(Arrays.asList(Sort.builder().asc(true).field(Account.CREATE_TIME).build()))
+                .pageIndex(0)
+                .pageSize(1)
+                .fields(null)
+                .build()
+        ).check().getData().get(0);
+    }
+
+    private Account findAccountMobileIsNotNullFirst() {
+        List<GenericCondition<String>> conditions = Arrays.asList(
+                GenericCondition.<String>builder()
+                        .relationalOp(RelationalOpConstVal.IS_NOT_NULL)
+                        .logicalOp(LogicalOpConstVal.AND)
+                        .otherValue(null)
+                        .field(Account.MOBILE)
+                        .build()
+
+        );
+        return accountBaseApi.page(PageQueryRequest.builder()
+                .conditions(conditions)
+                .sorts(Arrays.asList(Sort.builder().asc(true).field(Account.CREATE_TIME).build()))
+                .pageIndex(0)
+                .pageSize(1)
+                .fields(null)
+                .build()
+        ).check().getData().get(0);
     }
 
     private final static RegisterByMobileRequest registerByMobileRequest = RegisterByMobileRequest.builder()

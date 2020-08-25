@@ -1,8 +1,8 @@
 package ace.user.app.logic.api.core.biz.identity.register;
 
-import ace.account.base.define.dao.enums.account.AccountBizTypeEnum;
-import ace.account.base.define.dao.model.entity.Account;
-import ace.account.base.define.model.request.ExistsByUserNameRequest;
+
+import ace.authentication.base.define.dao.model.entity.Account;
+import ace.authentication.base.define.model.request.ExistsByUserNameRequest;
 import ace.captcha.base.api.CaptchaBaseApi;
 import ace.captcha.base.define.model.bo.CaptchaVerifyCodeId;
 import ace.captcha.base.define.model.request.CheckRequest;
@@ -47,7 +47,6 @@ public class RegisterByUserNameBiz extends AbstractRegisterCoreBiz<RegisterByUse
     protected boolean isExist(RegisterByUserNameRequest request) {
         ExistsByUserNameRequest existsByUserNameRequest = ExistsByUserNameRequest.builder()
                 .userName(request.getUserName())
-                .bizType(AccountBizTypeEnum.USER.getCode())
                 .appId(request.getAppId())
                 .build();
         return super.getIdentityBaseApi().existsByUserName(existsByUserNameRequest).check();
@@ -72,7 +71,7 @@ public class RegisterByUserNameBiz extends AbstractRegisterCoreBiz<RegisterByUse
     }
 
     @Override
-    protected RegisterByUserNameResponse newResponse() {
+    protected RegisterByUserNameResponse newRegisterResponse() {
         return new RegisterByUserNameResponse();
     }
 

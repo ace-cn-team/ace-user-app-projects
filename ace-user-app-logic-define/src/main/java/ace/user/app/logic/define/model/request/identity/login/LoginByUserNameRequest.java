@@ -1,6 +1,6 @@
 package ace.user.app.logic.define.model.request.identity.login;
 
-import ace.account.base.define.constraint.AccountLoginSourceConstraint;
+import ace.authentication.base.define.constraint.AccountLoginSourceConstraint;
 import ace.common.base.define.model.constraint.AppIdConstraint;
 import ace.user.app.logic.define.constraint.PasswordConstraint;
 import ace.user.app.logic.define.constraint.UserNameConstraint;

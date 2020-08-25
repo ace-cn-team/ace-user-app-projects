@@ -1,5 +1,6 @@
 package ace.user.app.web.controller;
 
+import ace.fw.logic.common.aop.Interceptor.log.annotations.LogAspect;
 import ace.fw.model.response.GenericResponseExt;
 import ace.user.app.logic.api.service.IdentityLogicService;
 import ace.user.app.logic.define.model.request.identity.GetCurrentUserRequest;
@@ -29,9 +30,17 @@ import javax.validation.Valid;
  */
 @RestController
 @Validated
+@LogAspect
 public class IdentityController {
 
     public final static String REGISTER_BY_MOBILE_URL = "/user/identity/register/mobile";
+    public final static String REGISTER_BY_USERNAME_URL = "/user/identity/register/username";
+    public final static String LOGIN_BY_MOBILE_URL = "/user/identity/login/mobile";
+    public final static String LOGIN_BY_USERNAME_URL = "/user/identity/login/username";
+    public final static String GET_CURRENT_USER_URL = "/user/identity/current";
+    public final static String LOGOUT_URL = "/user/identity/logout";
+
+
     @Autowired
     private IdentityLogicService identityLogicService;
 
@@ -52,7 +61,7 @@ public class IdentityController {
      * @param request
      * @return
      */
-    @PostMapping("/user/identity/register/username")
+    @PostMapping(REGISTER_BY_USERNAME_URL)
     public GenericResponseExt<RegisterByUserNameResponse> registerByUserName(@Valid @RequestBody RegisterByUserNameRequest request) {
         return identityLogicService.registerByUserName(request);
     }
@@ -63,7 +72,7 @@ public class IdentityController {
      * @param request
      * @return
      */
-    @PostMapping("/user/identity/login/mobile")
+    @PostMapping(LOGIN_BY_MOBILE_URL)
     public GenericResponseExt<LoginByMobileResponse> loginByMobile(@Valid @RequestBody LoginByMobileRequest request) {
         return identityLogicService.loginByMobile(request);
     }
@@ -74,7 +83,7 @@ public class IdentityController {
      * @param request
      * @return
      */
-    @PostMapping("/user/identity/login/username")
+    @PostMapping(LOGIN_BY_USERNAME_URL)
     public GenericResponseExt<LoginByUserNameResponse> loginByUserName(@Valid @RequestBody LoginByUserNameRequest request) {
         return identityLogicService.loginByUserName(request);
     }
@@ -85,7 +94,7 @@ public class IdentityController {
      * @param request
      * @return
      */
-    @PostMapping("/user/identity/current")
+    @PostMapping(GET_CURRENT_USER_URL)
     public GenericResponseExt<GetCurrentUserResponse> getCurrentUser(@Valid @RequestBody GetCurrentUserRequest request) {
         return identityLogicService.getCurrentUser(request);
     }
@@ -95,7 +104,7 @@ public class IdentityController {
      *
      * @param request
      */
-    @PostMapping("/user/identity/logout")
+    @PostMapping(LOGOUT_URL)
     public GenericResponseExt<Boolean> logout(@Valid @RequestBody LogoutRequest request) {
         return identityLogicService.logout(request);
     }

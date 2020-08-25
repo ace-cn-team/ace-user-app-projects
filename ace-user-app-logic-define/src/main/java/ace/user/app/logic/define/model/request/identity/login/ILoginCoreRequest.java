@@ -1,6 +1,6 @@
 package ace.user.app.logic.define.model.request.identity.login;
 
-import ace.account.base.define.enums.LoginSourceEnum;
+import ace.authentication.base.define.enums.LoginSourceEnum;
 import ace.common.base.define.model.bo.IAppId;
 import ace.fw.util.AceEnumUtils;
 

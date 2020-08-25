@@ -1,6 +1,6 @@
 package ace.user.app.logic.define.model.request.identity.register;
 
-import ace.account.base.define.constraint.AccountRegisterSourceConstraint;
+import ace.authentication.base.define.constraint.AccountRegisterSourceConstraint;
 import ace.captcha.base.define.constraint.CaptchaVerifyCodeBizIdConstraint;
 import ace.captcha.base.define.constraint.CaptchaVerifyCodeConstraint;
 import ace.common.base.define.model.constraint.AppIdConstraint;
