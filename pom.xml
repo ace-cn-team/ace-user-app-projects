@@ -8,38 +8,30 @@
         <version>1.0.0.10</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.ace</groupId>
     <artifactId>ace-user-app-projects</artifactId>
     <version>1.0.0.0-SNAPSHOT</version>
     <description>
         用户应用服务
     </description>
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-    </dependencies>
+    <properties>
+        <ace.fw.version>1.0.0.49</ace.fw.version>
+        <ace.dependency.management.version>1.0.0.14</ace.dependency.management.version>
+        <ace.authentication.base.version>1.0.0.13</ace.authentication.base.version>
+        <ace.cas.base.version>1.0.0.11</ace.cas.base.version>
+        <ace.sms.base.version>1.0.0.12</ace.sms.base.version>
+        <ace.captcha.base.version>1.0.0.4</ace.captcha.base.version>
+        <ace.user.base.version>1.0.0.11</ace.user.base.version>
+        <ace.common.base.version>1.0.0.11</ace.common.base.version>
+    </properties>
     <packaging>pom</packaging>
     <modules>
         <module>ace-user-app-logic-api</module>
         <module>ace-user-app-logic-define</module>
         <module>ace-user-app-logic-api-core</module>
         <module>ace-user-app-logic-api-autoconfigure</module>
-        <module>ace-user-app-logic-api-core-junit</module>
         <module>ace-user-app-web</module>
     </modules>
-    <properties>
-        <ace.fw.version>1.0.0.39</ace.fw.version>
-        <ace.dependency.management.version>1.0.0.12</ace.dependency.management.version>
-        <ace.authentication.base.version>1.0.0.7</ace.authentication.base.version>
-        <ace.cas.base.version>1.0.0.11</ace.cas.base.version>
-        <ace.sms.base.version>1.0.0.12</ace.sms.base.version>
-        <ace.captcha.base.version>1.0.0.4</ace.captcha.base.version>
-        <ace.user.base.version>1.0.0.7</ace.user.base.version>
-        <ace.common.base.version>1.0.0.11</ace.common.base.version>
-    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

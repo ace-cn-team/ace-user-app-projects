@@ -31,7 +31,7 @@ public class ModifyUserInfoBiz {
 
     public void modifyUserInfo(ModifyUserInfoRequest request) {
 
-        User user = userBaseApi.getById(request.getAccountId()).check();
+        User user = userBaseApi.findById(request.getAccountId()).check();
 
         if (user == null) {
             this.insert(request);
@@ -44,7 +44,6 @@ public class ModifyUserInfoBiz {
 
         User modifyUser = User.builder()
                 .id(originalUser.getId())
-                .rowVersion(RestApiConstants.VERSION_AUTO_UPDATE_INTEGER_VALUE)
                 .sex(request.getSex())
                 .avatarUrl(request.getAvatarUrl())
                 .signature(request.getSignature())
@@ -60,7 +59,7 @@ public class ModifyUserInfoBiz {
     }
 
     private void insert(ModifyUserInfoRequest request) {
-        Account account = accountBaseApi.getById(request.getAccountId()).check();
+        Account account = accountBaseApi.findById(request.getAccountId()).check();
 
         if (account == null) {
             BusinessErrorUtils.throwNew(AccountBusinessErrorEnum.EXIST_NOT_ACCOUNT);

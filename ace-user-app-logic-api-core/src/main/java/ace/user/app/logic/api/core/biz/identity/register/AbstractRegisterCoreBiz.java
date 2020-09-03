@@ -161,7 +161,7 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
                 .appId(request.getAppId())
                 .registerTime(LocalDateTime.now())
                 .registerSource(request.getSourceEnum().getCode())
-                .ip(WebUtils.getIpAddr())
+                .ip(this.getIpAddr())
                 .paramsId(UserLogicConstants.PARAMS_ID_REGISTER_EVENT)
                 .params(null)
                 .build();
@@ -195,6 +195,14 @@ public abstract class AbstractRegisterCoreBiz<Request extends IRegisterRequest, 
         );
 
         return account;
+    }
+
+    protected String getIpAddr() {
+        try {
+            return WebUtils.getIpAddr();
+        } catch (Throwable ex) {
+            return "127.0.0.1";
+        }
     }
 
     /**

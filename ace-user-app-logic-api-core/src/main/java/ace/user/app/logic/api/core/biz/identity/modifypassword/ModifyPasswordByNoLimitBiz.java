@@ -33,7 +33,7 @@ public class ModifyPasswordByNoLimitBiz extends AbstractModifyPasswordBiz<Modify
 
     @Override
     protected Account findAccount(ModifyPasswordByNoLimitRequest request) {
-        Account account = getAccountBaseApi().getById(request.getAccountId()).check();
+        Account account = getAccountBaseApi().findById(request.getAccountId()).check();
         return account;
     }
 }

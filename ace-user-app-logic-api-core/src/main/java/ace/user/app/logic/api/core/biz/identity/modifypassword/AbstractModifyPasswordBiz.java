@@ -54,7 +54,6 @@ public abstract class AbstractModifyPasswordBiz<Request extends IModifyPasswordR
         String encodeNewPassword = passwordUtils.encode(request.getNewPassword(), salt);
         Account modifyAccount = Account.builder()
                 .id(account.getId())
-                .rowVersion(RestApiConstants.VERSION_AUTO_UPDATE_INTEGER_VALUE)
                 .password(encodeNewPassword)
                 .passwordEncryptionFactor(salt)
                 .build();

@@ -14,6 +14,7 @@ import ace.fw.json.JsonUtils;
 import ace.fw.logic.common.util.AceUUIDUtils;
 import ace.fw.model.response.GenericResponseExt;
 import ace.fw.util.BusinessErrorUtils;
+import ace.fw.utils.web.WebUtils;
 import ace.user.app.logic.api.core.converter.OAuthTokenConverter;
 import ace.user.app.logic.api.core.provider.OAuth2Provider;
 import ace.user.app.logic.api.core.util.PasswordUtils;
@@ -89,7 +90,7 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
      * @param account
      */
     protected void checkUserIsExistNoThrowable(GenericResponseExt<Response> responseExt, ILoginCoreResponse response, Request request, Account account) {
-        User user = userBaseApi.getById(account.getId()).check();
+        User user = userBaseApi.findById(account.getId()).check();
         if (user == null) {
             responseExt.setCode(UserLogicBusinessErrorEnum.USER_NOT_EXIST.getCode());
             responseExt.setMessage(UserLogicBusinessErrorEnum.USER_NOT_EXIST.getDesc());
@@ -157,7 +158,7 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
                 .accountId(account.getId())
                 .appId(request.getAppId())
                 .loginTime(LocalDateTime.now())
-                .ip(ace.fw.utils.web.WebUtils.getIpAddr())
+                .ip(this.getIpAddr())
                 .loginSource(request.getLoginSourceEnum().getCode())
                 .paramsId(UserLogicConstants.PARAMS_ID_LOGIN_EVENT_)
                 .params(null)
@@ -177,6 +178,14 @@ public abstract class AbstractLoginCoreBiz<Request extends ILoginCoreRequest, Re
             accountEventBaseApi.save(accountEvent);
         } catch (Throwable ex) {
             log.error("保存用户登录事件失败", ex);
+        }
+    }
+
+    protected String getIpAddr() {
+        try {
+            return WebUtils.getIpAddr();
+        } catch (Throwable ex) {
+            return "127.0.0.1";
         }
     }
 

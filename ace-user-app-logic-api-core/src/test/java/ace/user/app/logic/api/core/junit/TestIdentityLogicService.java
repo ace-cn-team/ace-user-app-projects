@@ -2,23 +2,22 @@ package ace.user.app.logic.api.core.junit;
 
 import ace.authentication.base.api.AccountBaseApi;
 import ace.authentication.base.define.dao.enums.account.AccountRegisterSourceEnum;
-
 import ace.authentication.base.define.dao.model.entity.Account;
 import ace.authentication.base.define.enums.LoginSourceEnum;
-import ace.fw.data.model.GenericCondition;
-import ace.fw.data.model.LogicalOpConstVal;
-import ace.fw.data.model.RelationalOpConstVal;
-import ace.fw.data.model.Sort;
-import ace.fw.data.model.request.resful.PageQueryRequest;
+import ace.fw.json.JsonUtils;
 import ace.fw.logic.common.util.AceUUIDUtils;
 import ace.fw.model.response.GenericResponseExt;
+import ace.fw.restful.base.api.model.request.base.PageRequest;
+import ace.fw.restful.base.api.util.QueryUtils;
 import ace.fw.util.AceRandomUtils;
 import ace.sms.base.api.SmsVerifyCodeBaseApi;
 import ace.sms.define.base.enums.SmsVerifyCodeTypeEnum;
 import ace.sms.define.base.model.bo.VerifyCodeId;
 import ace.sms.define.base.model.request.SendVerifyCodeRequest;
+import ace.user.app.logic.api.core.JUnitApplication;
 import ace.user.app.logic.api.service.IdentityLogicService;
 import ace.user.app.logic.define.constants.UserLogicConstants;
+import ace.user.app.logic.define.model.request.identity.GetCurrentUserRequest;
 import ace.user.app.logic.define.model.request.identity.LogoutRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
 import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
@@ -27,10 +26,9 @@ import ace.user.app.logic.define.model.request.identity.modifypassword.ModifyPas
 import ace.user.app.logic.define.model.request.identity.modifypassword.ModifyPasswordBySmsVerifyCodeRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByMobileRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByUserNameRequest;
-import ace.user.app.logic.define.model.request.identity.GetCurrentUserRequest;
+import ace.user.app.logic.define.model.response.identity.GetCurrentUserResponse;
 import ace.user.app.logic.define.model.response.identity.login.LoginByMobileResponse;
 import ace.user.app.logic.define.model.response.identity.login.LoginByUserNameResponse;
-import ace.user.app.logic.define.model.response.identity.GetCurrentUserResponse;
 import ace.user.app.logic.define.model.vo.OAuth2TokenVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -41,10 +39,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Caspar
@@ -54,7 +50,7 @@ import java.util.List;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = JUnitApplication.class)
+@SpringBootTest(classes = {JUnitApplication.class})
 @FixMethodOrder(value = MethodSorters.NAME_ASCENDING)
 public class TestIdentityLogicService {
 
@@ -106,11 +102,21 @@ public class TestIdentityLogicService {
 
     @Test
     public void test_0004_loginByUserName() {
+        Account account = this.findAccountUserNameIsNotNullFirst();
+
+        Boolean isModifySuccess = identityLogicService.modifyPasswordByNoLimit(ModifyPasswordByNoLimitRequest.builder()
+                .accountId(account.getId())
+                .newPassword(TEST_PASSWORD)
+                .build()
+        ).check();
+        Assert.assertTrue(isModifySuccess);
+
         LoginByUserNameResponse loginByUserNameResponse = identityLogicService.loginByUserName(LoginByUserNameRequest.builder()
-                .appId(registerByUserNameRequest.getAppId())
-                .password(registerByUserNameRequest.getPassword())
+                .appId(account.getAppId())
+                .userName(account.getUserName())
+                .password(TEST_PASSWORD)
                 .sourceType(LoginSourceEnum.PC.getCode())
-                .userName(registerByUserNameRequest.getUserName())
+
                 .build()).check();
 
         Assert.assertNotNull(loginByUserNameResponse.getToken());
@@ -235,32 +241,27 @@ public class TestIdentityLogicService {
     }
 
     private Account findAccountFirst() {
-        return accountBaseApi.page(PageQueryRequest.builder()
-                .conditions(null)
-                .sorts(Arrays.asList(Sort.builder().asc(true).field(Account.CREATE_TIME).build()))
-                .pageIndex(0)
-                .pageSize(1)
-                .fields(null)
+        return accountBaseApi.page(PageRequest.builder()
+                .orderBy(QueryUtils.orderByAsc(Account::getCreateTime))
+                .pager(QueryUtils.pager(0, 1))
                 .build()
         ).check().getData().get(0);
     }
 
     private Account findAccountMobileIsNotNullFirst() {
-        List<GenericCondition<String>> conditions = Arrays.asList(
-                GenericCondition.<String>builder()
-                        .relationalOp(RelationalOpConstVal.IS_NOT_NULL)
-                        .logicalOp(LogicalOpConstVal.AND)
-                        .otherValue(null)
-                        .field(Account.MOBILE)
-                        .build()
+        return accountBaseApi.page(PageRequest.builder()
+                .where(QueryUtils.where().isNotNull(Account::getMobile))
+                .orderBy(QueryUtils.orderByDesc(Account::getCreateTime))
+                .pager(QueryUtils.pager(0, 1))
+                .build()
+        ).check().getData().get(0);
+    }
 
-        );
-        return accountBaseApi.page(PageQueryRequest.builder()
-                .conditions(conditions)
-                .sorts(Arrays.asList(Sort.builder().asc(true).field(Account.CREATE_TIME).build()))
-                .pageIndex(0)
-                .pageSize(1)
-                .fields(null)
+    private Account findAccountUserNameIsNotNullFirst() {
+        return accountBaseApi.page(PageRequest.builder()
+                .where(QueryUtils.where().isNotNull(Account::getUserName))
+                .orderBy(QueryUtils.orderByDesc(Account::getCreateTime))
+                .pager(QueryUtils.pager(0, 1))
                 .build()
         ).check().getData().get(0);
     }

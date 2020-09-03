@@ -1,27 +1,11 @@
 package ace.user.app.logic.api.core.junit;
 
-import ace.authentication.base.define.dao.enums.account.AccountRegisterSourceEnum;
-import ace.authentication.base.define.enums.LoginSourceEnum;
-import ace.fw.data.model.PageResponse;
-import ace.fw.data.model.Sort;
-import ace.fw.data.model.request.resful.PageQueryRequest;
-import ace.fw.logic.common.util.AceUUIDUtils;
-import ace.fw.model.response.GenericResponseExt;
-import ace.fw.util.AceRandomUtils;
+import ace.fw.restful.base.api.model.request.base.PageRequest;
+import ace.fw.restful.base.api.util.QueryUtils;
 import ace.fw.util.DateUtils;
-import ace.user.app.logic.api.service.IdentityLogicService;
+import ace.user.app.logic.api.core.JUnitApplication;
 import ace.user.app.logic.api.service.UserLogicService;
-import ace.user.app.logic.define.model.request.identity.GetCurrentUserRequest;
-import ace.user.app.logic.define.model.request.identity.LogoutRequest;
-import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
-import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
-import ace.user.app.logic.define.model.request.identity.register.RegisterByMobileRequest;
-import ace.user.app.logic.define.model.request.identity.register.RegisterByUserNameRequest;
 import ace.user.app.logic.define.model.request.user.ModifyUserInfoRequest;
-import ace.user.app.logic.define.model.response.identity.GetCurrentUserResponse;
-import ace.user.app.logic.define.model.response.identity.login.LoginByMobileResponse;
-import ace.user.app.logic.define.model.response.identity.login.LoginByUserNameResponse;
-import ace.user.app.logic.define.model.vo.OAuth2TokenVo;
 import ace.user.base.api.UserBaseApi;
 import ace.user.base.define.dao.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +16,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Arrays;
 
 /**
  * @author Caspar
@@ -44,7 +27,7 @@ import java.util.Arrays;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = JUnitApplication.class)
+@SpringBootTest(classes = {JUnitApplication.class})
 @FixMethodOrder(value = MethodSorters.NAME_ASCENDING)
 public class TestUserLogicService {
 
@@ -58,16 +41,9 @@ public class TestUserLogicService {
      */
     @Test
     public void test_0001_modifyUserInfo() {
-        User user = userBaseApi.page(PageQueryRequest.builder()
-                .pageIndex(1)
-                .pageSize(1)
-                .sorts(Arrays.asList(
-                        Sort.builder()
-                                .asc(true)
-                                .field(User.ID)
-                                .build()
-                        )
-                )
+        User user = userBaseApi.page(PageRequest.builder()
+                .pager(QueryUtils.pager(0, 1))
+                .orderBy(QueryUtils.orderByAsc(User::getId))
                 .build()
         ).check().getData().get(0);
 
@@ -82,7 +58,7 @@ public class TestUserLogicService {
                 .build()
         ).check();
 
-        User updateUser = userBaseApi.getById(user.getId()).check();
+        User updateUser = userBaseApi.findById(user.getId()).check();
 
         Assert.assertEquals(updateUser.getAvatarUrl(), avatarUrl);
         Assert.assertEquals(updateUser.getNickName(), nickName);

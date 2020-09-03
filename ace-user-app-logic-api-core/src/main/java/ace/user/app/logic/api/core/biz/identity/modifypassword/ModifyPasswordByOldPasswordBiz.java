@@ -34,6 +34,6 @@ public class ModifyPasswordByOldPasswordBiz extends AbstractModifyPasswordBiz<Mo
 
     @Override
     protected Account findAccount(ModifyPasswordByOldPasswordRequest request) {
-        return getAccountBaseApi().getById(request.getAccountId()).check();
+        return getAccountBaseApi().findById(request.getAccountId()).check();
     }
 }

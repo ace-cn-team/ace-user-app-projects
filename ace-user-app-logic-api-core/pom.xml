@@ -14,37 +14,56 @@
     <dependencies>
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-user-base-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.ace</groupId>
-            <artifactId>ace-user-base-define</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.ace</groupId>
             <artifactId>ace-user-app-logic-api</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-authentication-base-api</artifactId>
+            <artifactId>ace-authentication-base-api-client-autoconfigure</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-cas-base-api</artifactId>
+            <artifactId>ace-user-base-api-client-autoconfigure</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-sms-base-api</artifactId>
+            <artifactId>ace-captcha-base-api-client-autoconfigure</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-captcha-base-api</artifactId>
+            <artifactId>ace-sms-base-api-client-autoconfigure</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ace</groupId>
-            <artifactId>ace-cas-base-api</artifactId>
+            <artifactId>ace-cas-base-api-client-autoconfigure</artifactId>
         </dependency>
+
+        <!-- 构架自动配置模块 start -->
+<!--        <dependency>-->
+<!--            <groupId>org.ace</groupId>-->
+<!--            <artifactId>ace-fw-ms-application-autoconfigure</artifactId>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-fw-ms-nacos-discovery-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-fw-ms-feign-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-fw-json-jackson-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-fw-log4j2-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-fw-logic-common-autoconfigure</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.ace</groupId>
             <artifactId>ace-common-base-define</artifactId>
@@ -73,5 +92,28 @@
             <groupId>org.ace</groupId>
             <artifactId>ace-fw-logic-common</artifactId>
         </dependency>
+        <!-- 构架自动配置模块 end -->
+        <!-- 单元测试依赖 start -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ace</groupId>
+            <artifactId>ace-fw-junit-test-starter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- 单元测试依赖 end -->
     </dependencies>
 </project>

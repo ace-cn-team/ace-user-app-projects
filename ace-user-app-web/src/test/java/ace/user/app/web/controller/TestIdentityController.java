@@ -3,18 +3,14 @@ package ace.user.app.web.controller;
 import ace.authentication.base.api.AccountBaseApi;
 import ace.authentication.base.define.dao.enums.account.AccountRegisterSourceEnum;
 import ace.authentication.base.define.dao.model.entity.Account;
-import ace.authentication.base.define.enums.LoginSourceEnum;
-import ace.fw.data.model.*;
-import ace.fw.data.model.request.resful.PageQueryRequest;
 import ace.fw.json.JsonUtils;
 import ace.fw.logic.common.util.AceUUIDUtils;
 import ace.fw.model.response.GenericResponseExt;
+import ace.fw.restful.base.api.model.request.base.PageRequest;
+import ace.fw.restful.base.api.util.QueryUtils;
 import ace.fw.util.AceRandomUtils;
-import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
-import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByMobileRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByUserNameRequest;
-import ace.user.app.logic.define.model.response.identity.login.LoginByMobileResponse;
 import ace.user.app.logic.define.model.response.identity.register.RegisterByMobileResponse;
 import ace.user.app.logic.define.model.response.identity.register.RegisterByUserNameResponse;
 import ace.user.app.web.UserWebApplication;
@@ -233,40 +229,19 @@ public class TestIdentityController {
     }
 
     private Account findAccountWithMobileFirst() {
-        List<GenericCondition<String>> conditions = Arrays.asList(GenericCondition.<String>builder()
-                .field(Account.MOBILE)
-                .relationalOp(RelationalOpConstVal.IS_NOT_NULL)
-                .build()
-        );
-        List<Sort> sorts = Arrays.asList(Sort.builder()
-                .field(Account.ID)
-                .asc(true)
-                .build());
-        Account account = accountBaseApi.page(PageQueryRequest.builder()
-                .pageSize(1)
-                .pageIndex(1)
-                .sorts(sorts)
-                .conditions(conditions)
+        Account account = accountBaseApi.page(PageRequest.builder()
+                .orderBy(QueryUtils.orderByAsc(Account::getCreateTime))
+                .where(QueryUtils.where().isNotNull(Account::getMobile))
                 .build()
         ).check().getData().get(0);
         return account;
     }
 
     private Account findAccountWithUserNameFirst() {
-        List<GenericCondition<String>> conditions = Arrays.asList(GenericCondition.<String>builder()
-                .field(Account.USER_NAME)
-                .relationalOp(RelationalOpConstVal.IS_NOT_NULL)
-                .build()
-        );
-        List<Sort> sorts = Arrays.asList(Sort.builder()
-                .field(Account.ID)
-                .asc(true)
-                .build());
-        Account account = accountBaseApi.page(PageQueryRequest.builder()
-                .pageSize(1)
-                .pageIndex(1)
-                .sorts(sorts)
-                .conditions(conditions)
+
+        Account account = accountBaseApi.page(PageRequest.builder()
+                .orderBy(QueryUtils.orderByAsc(Account::getCreateTime))
+                .where(QueryUtils.where().isNotNull(Account::getUserName))
                 .build()
         ).check().getData().get(0);
         return account;

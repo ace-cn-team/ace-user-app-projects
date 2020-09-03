@@ -2,30 +2,20 @@ package ace.user.app.logic.api.core.junit;
 
 import ace.authentication.base.api.IdentityBaseApi;
 import ace.authentication.base.define.dao.enums.account.AccountRegisterSourceEnum;
-import ace.authentication.base.define.enums.LoginSourceEnum;
 import ace.authentication.base.define.model.request.ExistsByMobileRequest;
 import ace.fw.logic.common.util.AceUUIDUtils;
-import ace.fw.model.response.GenericResponseExt;
 import ace.fw.util.AceRandomUtils;
-import ace.user.app.logic.api.service.IdentityLogicService;
-import ace.user.app.logic.define.model.request.identity.GetCurrentUserRequest;
-import ace.user.app.logic.define.model.request.identity.LogoutRequest;
-import ace.user.app.logic.define.model.request.identity.login.LoginByMobileRequest;
-import ace.user.app.logic.define.model.request.identity.login.LoginByUserNameRequest;
+import ace.user.app.logic.api.core.JUnitApplication;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByMobileRequest;
 import ace.user.app.logic.define.model.request.identity.register.RegisterByUserNameRequest;
-import ace.user.app.logic.define.model.response.identity.GetCurrentUserResponse;
-import ace.user.app.logic.define.model.response.identity.login.LoginByMobileResponse;
-import ace.user.app.logic.define.model.response.identity.login.LoginByUserNameResponse;
-import ace.user.app.logic.define.model.vo.OAuth2TokenVo;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -36,7 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = JUnitApplication.class)
+@SpringBootTest(classes = {JUnitApplication.class})
 @FixMethodOrder(value = MethodSorters.NAME_ASCENDING)
 public class TestIdentityBaseApiService {
 
